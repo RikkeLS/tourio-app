@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import "./Comment";
 
 const placeSchema = new Schema({
   name: { type: String, required: true },

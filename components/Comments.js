@@ -1,8 +1,9 @@
 import styled from "styled-components";
 import { FormContainer, Input, Label } from "./Form";
 import { StyledButton } from "./StyledButton.js";
+import useSWR from "swr";
 
-export default function Comments({ locationName, comments }) {
+export default function Comments({ locationName, comments, placeId }) {
   const Article = styled.article`
     display: flex;
     flex-direction: column;
@@ -17,8 +18,25 @@ export default function Comments({ locationName, comments }) {
     }
   `;
 
-  function handleSubmitComment(e) {
+  const { mutate } = useSWR(`/api/places/${placeId}`);
+  // console.log(placeId);
+  async function handleSubmitComment(e) {
     e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    data.placeID = placeId;
+    console.log(data);
+    const response = await fetch(`/api/places/${placeId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      mutate();
+    }
   }
 
   return (
