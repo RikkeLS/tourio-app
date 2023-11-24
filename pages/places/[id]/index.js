@@ -43,14 +43,14 @@ export default function DetailsPage() {
 
   async function deletePlace() {
     await fetch(`/api/places/${id}`, {
-      method:'DELETE'
-    })
-    router.push('/')
+      method: "DELETE",
+    });
+    router.push("/");
   }
 
   return (
     <>
-      <Link href={'/'} passHref legacyBehavior>
+      <Link href={"/"} passHref legacyBehavior>
         <StyledLink justifySelf="start">back</StyledLink>
       </Link>
       <ImageContainer>
@@ -68,7 +68,9 @@ export default function DetailsPage() {
         {place.name}, {place.location}
       </h2>
       <Link href={place.mapURL} passHref legacyBehavior>
-        <StyledLocationLink>Location on Google Maps</StyledLocationLink>
+        <StyledLocationLink target="_blank">
+          Location on Google Maps
+        </StyledLocationLink>
       </Link>
       <p>{place.description}</p>
       <ButtonContainer>
