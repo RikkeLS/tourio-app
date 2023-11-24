@@ -1,6 +1,7 @@
 import Place from "../../../../db/models/Place";
 import Comment from "../../../../db/models/Comment";
 import dbConnect from "../../../../db/dbConnect";
+import mongoose from "mongoose";
 
 export default async function handler(request, response) {
   const { id } = request.query;
@@ -12,7 +13,7 @@ export default async function handler(request, response) {
   await dbConnect();
 
   if (request.method === "GET") {
-    const place = await Place.findById(id);
+    const place = await Place.findById(id).populate('comments');
 
     if (!place) {
       return response.status(404).json({ status: "Not found" });
@@ -23,8 +24,16 @@ export default async function handler(request, response) {
   if (request.method === "POST") {
     try {
       const comment = request.body;
-      console.log(comment);
       await Comment.create(comment);
+      // updating the comments array with new ObjectIDs in the places collection:
+      const place = await Place.findById(id)
+      const ObjectID = place._id;
+      const commentsForPlace = await Comment.aggregate([{ $match: { 'placeID': ObjectID } }]);
+      const commentIDs = commentsForPlace.map(comment => comment._id)
+      const commentsObject = {'comments':commentIDs}
+      await Place.findByIdAndUpdate(id, {
+        $set: commentsObject,
+      });
       return response.status(201).json({ status: "Comment created" });
     } catch (error) {
       return response.status(400).json({ error: error.message });

@@ -19,13 +19,12 @@ export default function Comments({ locationName, comments, placeId }) {
   `;
 
   const { mutate } = useSWR(`/api/places/${placeId}`);
-  // console.log(placeId);
+  
   async function handleSubmitComment(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData);
-    data.placeID = placeId;
-    console.log(data);
+    data.placeID = placeId
     const response = await fetch(`/api/places/${placeId}`, {
       method: "POST",
       headers: {
@@ -33,7 +32,6 @@ export default function Comments({ locationName, comments, placeId }) {
       },
       body: JSON.stringify(data),
     });
-
     if (response.ok) {
       mutate();
     }
