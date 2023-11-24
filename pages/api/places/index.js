@@ -15,10 +15,9 @@ export default async function handler(request, response) {
     try {
       const place = request.body;
       await Place.create(place)
-      console.log('new place:',place);
-      response.status(201).json({status: 'Place created'})
+      return response.status(201).json({status: 'Place created'})
     } catch (error){
-      response.status(400).json({error: error.message})
+      return response.status(400).json({error: error.message})
     }
   }
 }
