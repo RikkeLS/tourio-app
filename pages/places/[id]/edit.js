@@ -3,12 +3,13 @@ import Link from "next/link";
 import useSWR from "swr";
 import Form from "../../../components/Form.js";
 import { StyledLink } from "../../../components/StyledLink.js";
+import { createGlobalStyle } from "styled-components";
 
 export default function EditPage() {
   const router = useRouter();
   const { isReady } = router;
   const { id } = router.query;
-  const { data: place, isLoading, error, mutate } = useSWR(`/api/places/${id}`);
+  const { data: place, isLoading, error } = useSWR(`/api/places/${id}`);
 
   async function editPlace(enteredPlace) {
     const response = await fetch(`/api/places/${id}`, {
@@ -19,9 +20,16 @@ export default function EditPage() {
       body: JSON.stringify(enteredPlace),
     });
 
+    
     if (response.ok) {
-      mutate();
+      const data = await response.json()
+      console.log(data);
+
+      alert(data.status)
+
+      router.push(`/places/${id}`);
     }
+
   }
 
   if (!isReady || isLoading || error) return <h2>Loading...</h2>;
