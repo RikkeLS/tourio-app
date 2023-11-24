@@ -64,7 +64,9 @@ export default function DetailsPage() {
         {place.name}, {place.location}
       </h2>
       <Link href={place.mapURL} passHref legacyBehavior>
-        <StyledLocationLink>Location on Google Maps</StyledLocationLink>
+        <StyledLocationLink target="_blank">
+          Location on Google Maps
+        </StyledLocationLink>
       </Link>
       <p>{place.description}</p>
       <ButtonContainer>
