@@ -24,13 +24,13 @@ export default async function handler(request, response) {
   if (request.method === "POST") {
     try {
       const comment = request.body;
-      await Comment.create(comment);
+      const newComment = await Comment.create(comment);
       // updating the comments array with new ObjectIDs in the places collection:
-      const place = await Place.findById(id)
-      const ObjectID = place._id;
-      const commentsForPlace = await Comment.aggregate([{ $match: { 'placeID': ObjectID } }]);
-      const commentIDs = commentsForPlace.map(comment => comment._id)
-      const commentsObject = {'comments':commentIDs}
+      const newCommentID = newComment._id
+      const place = await Place.findById(id,{comments:1})
+      const oldCommentIDs = place['comments']
+      const newCommentsArray = [newCommentID,...oldCommentIDs]
+      const commentsObject = {'comments':newCommentsArray}
       await Place.findByIdAndUpdate(id, {
         $set: commentsObject,
       });

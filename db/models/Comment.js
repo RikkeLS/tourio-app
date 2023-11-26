@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 const commentSchema = new Schema({
   name: { type: String, required: true },
   comment: { type: String, required: true },
-  placeID: { type: Schema.Types.ObjectId, ref: "Place" },
+  // placeID: { type: Schema.Types.ObjectId, ref: "Place" },
 });
 
 const Comment =
