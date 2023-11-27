@@ -12,6 +12,7 @@ export default function EditPage() {
   const { data: place, isLoading, error } = useSWR(`/api/places/${id}`);
 
   async function editPlace(enteredPlace) {
+    console.log('enteredPlace',enteredPlace);
     const response = await fetch(`/api/places/${id}`, {
       method: "PATCH",
       headers: {
@@ -43,7 +44,7 @@ export default function EditPage() {
       <Form
         onSubmit={editPlace}
         formName={"edit-place"}
-        defaultData={place.place}
+        defaultData={place}
       />
     </>
   );

@@ -1,7 +1,7 @@
 import Place from "../../../../db/models/Place";
+import Comment from "../../../../db/models/Comment";
 import dbConnect from "../../../../db/dbConnect";
-
-import { db_comments } from "../../../../lib/db_comments";
+import mongoose from "mongoose";
 
 export default async function handler(request, response) {
   const { id } = request.query;
@@ -13,29 +13,44 @@ export default async function handler(request, response) {
   await dbConnect();
 
   if (request.method === "GET") {
-    const place = await Place.findById(id);
-
-    const comment = place?.comments;
-    const allCommentIds = comment?.map((comment) => comment.$oid) || [];
-    const comments = db_comments.filter((comment) =>
-      allCommentIds.includes(comment._id.$oid)
-    );
+    const place = await Place.findById(id).populate('comments');
 
     if (!place) {
       return response.status(404).json({ status: "Not found" });
     }
-    response.status(200).json({ place: place, comments: comments });
+    response.status(200).json(place);
+  }
+
+  if (request.method === "POST") {
+    try {
+      const comment = request.body;
+      const newComment = await Comment.create(comment);
+      // updating the comments array with new ObjectIDs in the places collection:
+      const newCommentID = newComment._id
+      const place = await Place.findById(id,{comments:1})
+      const oldCommentIDs = place['comments']
+      const newCommentsArray = [newCommentID,...oldCommentIDs]
+      const commentsObject = {'comments':newCommentsArray}
+      await Place.findByIdAndUpdate(id, {
+        $set: commentsObject,
+      });
+      return response.status(201).json({ status: "Comment created" });
+    } catch (error) {
+      return response.status(400).json({ error: error.message });
+    }
   }
 
   if (request.method === "PATCH") {
     await Place.findByIdAndUpdate(id, {
       $set: request.body,
     });
-    return response.status(200).json({ status: `Place ${request.body.name} updated!` });
+    return response
+      .status(200)
+      .json({ status: `Place ${request.body.name} updated!` });
   }
 
-  if (request.method === 'DELETE') {
+  if (request.method === "DELETE") {
     await Place.findByIdAndDelete(id);
-    return response.status(200).json({status: `Place with ${id} is deleted`})
+    return response.status(200).json({ status: `Place with ${id} is deleted` });
   }
 }
